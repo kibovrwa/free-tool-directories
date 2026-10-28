@@ -48,16 +48,17 @@ out.sort((a, b) => a.platform.localeCompare(b.platform) || (a.date || '').locale
 const cols = ['platform', 'url', 'page', 'date', 'rel', 'check'];
 const esc = v => /[",\n]/.test(v = String(v ?? '')) ? '"' + v.replace(/"/g, '""') + '"' : v;
 const root = new URL('../', import.meta.url);
-fs.writeFileSync(new URL('data/listings.csv', root), [cols.join(','), ...out.map(r => cols.map(c => esc(r[c])).join(','))].join('\n') + '\n');
+fs.writeFileSync(new URL('private/listings.csv', root), [cols.join(','), ...out.map(r => cols.map(c => esc(r[c])).join(','))].join('\n') + '\n');
 // one row per directory
-const by = new Map(); for (const r of out) { const k = r.platform; if (!by.has(k) || (by.get(k).check !== 'ok' && r.check === 'ok')) by.set(k, r); }
+const BR = /astral|remove|easyface|reelsong|monareel|snapchat|chatgpt2word|srt2word|mechang|minecraft|gaivsiq|shortsrank|grokbot|webtoolslist|100days|animecard|capybara|ttktest/i;
+const by = new Map(); for (const r of out) { if (BR.test(r.platform)) continue; const k = r.platform; if (!by.has(k) || (by.get(k).check !== 'ok' && r.check === 'ok')) by.set(k, r); }
 const txt = d => out.filter(r => r.platform === d).map(r => (r.notes || '') + ' ' + (r.url)).join(' ').toLowerCase();
 const cat = t => /dev\.to|medium|hashnode|blog|article|substack/.test(t) ? 'Articles / blogs' : /launch|hunt|startup|indie|saas/.test(t) ? 'Launch / startup' : /\bai\b|ai[-.]|gpt|tool/.test(t) ? 'AI tools' : 'General web directory';
 const login = t => /guest|no.?login|no account|free form|domain-only/.test(t) ? 'No' : /login|account|sign.?up|github|google/.test(t) ? 'Yes' : '—';
 const review = t => /instant|auto|immediate/.test(t) ? 'Instant' : /approv|review|pending|moderat/.test(t) ? 'Manual review' : '—';
 const head = `# Free tool & AI directories that accept submissions (2026)
 
-A hand-checked list of **${by.size}** directories, launch boards and publishing platforms where an indie maker can list a web tool or AI app for free. Every entry was submitted to manually in 2026, and the "Example listing" column links to a real, published listing so you can see what an approved entry looks like before you spend time on the form. Links are re-checked by \`scripts/sync.mjs\`; entries that start returning 404 are removed.
+A hand-checked list of **${by.size}** directories, launch boards and publishing platforms where an indie maker can list a web tool or AI app for free. Every entry was submitted to manually in 2026, and a few rows link a sample published entry so you can see what an approved listing looks like. Links are re-checked by \`scripts/sync.mjs\`; entries that start returning 404 are removed.
 
 ## How to use this list
 
@@ -76,22 +77,23 @@ A hand-checked list of **${by.size}** directories, launch boards and publishing 
 
 ## Directories
 
-| Directory | Free? | Login needed? | Review time | Category | Example listing |
+| Directory | Free? | Login needed? | Review time | Category | Sample |
 |---|---|---|---|---|---|
 `;
-const lines = [...by.values()].sort((a, b) => a.platform.localeCompare(b.platform)).map(r => {
+const lines = [...by.values()].sort((a, b) => a.platform.localeCompare(b.platform))
+.map((r, i) => {
   const t = txt(r.platform);
-  return `| [${r.platform}](https://${r.platform.includes('.') ? (new URL(r.url).hostname) : r.platform}/) | Yes | ${login(t)} | ${review(t)} | ${cat(t)} | [example](${r.url}) |`;
+  return `| [${r.platform}](https://${r.platform.includes('.') ? (new URL(r.url).hostname) : r.platform}/) | Yes | ${login(t)} | ${review(t)} | ${cat(t)} | ${i % 6 === 3 && r.check === 'ok' ? `[sample](${r.url})` : '—'} |`;
 });
 fs.writeFileSync(new URL('README.md', root), head + lines.join('\n') + `
 
 ## Data
 
-Full list with every checked example: [\`data/listings.csv\`](data/listings.csv). Regenerate with \`node scripts/sync.mjs <ledger-dir>\`.
+Regenerate with \`node scripts/sync.mjs <data-dir>\`.
 
 ## License
 
 CC0 — use freely.
 `);
 console.log(out.length, 'rows,', by.size, 'directories,', out.filter(r => r.check !== 'ok').length, 'restricted');
-const cnt = {}; for (const r of out) cnt[r.site] = (cnt[r.site] || 0) + 1; console.error(JSON.stringify(cnt));
+const cnt = {}; for (const r of out) cnt[r.site] = (cnt[r.site] || 0) + 1; 
