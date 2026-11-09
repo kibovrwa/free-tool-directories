@@ -63,6 +63,7 @@ A hand-checked list of **87** directories, launch boards and publishing platform
 | [linkcentre.com](https://www.linkcentre.com/) | Yes | — | Manual review | General web directory | [sample](https://www.linkcentre.com/review/1721861/astralhoro-com) |
 | [magicly.bio](https://magicly.bio/) | Yes | — | — | AI tools | — |
 | [medium.com](https://medium.com/) | Yes | — | Manual review | Articles / blogs | — |
+| [meetnewai.com](https://meetnewai.com/) | Yes | Yes | Manual review | AI tools | — |
 | [meweblink.com](https://meweblink.com/) | Yes | — | — | General web directory | — |
 | [moon-sign-notes.straw.page](https://moon-sign-notes.straw.page/) | Yes | — | — | General web directory | — |
 | [newname.ai](https://newname.ai/) | Yes | — | Manual review | AI tools | — |
